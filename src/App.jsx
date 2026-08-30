@@ -4,21 +4,21 @@ import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import TeacherDashboard from './components/TeacherDashboard';
 import ParentStudentDashboard from './components/ParentStudentDashboard';
+import AdmissionsPortal from './components/AdmissionsPortal';
 
 export default function App() {
   const [session, setSession] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentView, setCurrentView] = useState('main'); // 'main' أو 'admission'
 
   useEffect(() => {
-    // 1. التحقق من الجلسة الحالية عند الفتح
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) fetchUserRole(session.user.id);
       else setLoading(false);
     });
 
-    // 2. الاستماع لتغيرات المصادقة (تسجيل دخول / خروج)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) {
@@ -32,7 +32,6 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // جلب دور المستخدم من جدول profiles
   const fetchUserRole = async (userId) => {
     try {
       setLoading(true);
@@ -60,12 +59,27 @@ export default function App() {
     );
   }
 
-  // إذا لم يكن مسجلاً للدخول، اعرض واجهة تسجيل الدخول
-  if (!session) {
-    return <Login />;
+  // إذا اختار الزائر عرض صفحة التسجيل القبلي وهو غير مسجل الدخول
+  if (!session && currentView === 'admission') {
+    return <AdmissionsPortal isAdmin={false} onBack={() => setCurrentView('main')} />;
   }
 
-  // توجيه المستخدم حسب دوره البرمجي
+  if (!session) {
+    return (
+      <div>
+        <Login />
+        <div className="text-center pb-6 bg-gray-50">
+          <button
+            onClick={() => setCurrentView('admission')}
+            className="text-sm text-emerald-600 hover:underline font-medium"
+          >
+            أنت ولي أمر جديد وترغب في تقديم طلب تسجيل قبلي لأبنائك؟ انقر هنا
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   switch (userRole) {
     case 'admin':
       return <AdminDashboard session={session} />;
@@ -90,4 +104,4 @@ export default function App() {
         </div>
       );
   }
-    }
+}
