@@ -16,7 +16,7 @@ export default function ParentStudentDashboard({ session }) {
     try {
       setLoading(true);
       const userId = session.user.id;
-      const userRole = session.user.user_metadata?.role || 'student'; // أو استعلام جدول profiles
+      const userRole = session.user.user_metadata?.role || 'student';
 
       // 1. جلب بيانات التلميذ (سواء كان هو المسجل أو ولي الأمر المرتبط به)
       let query = supabase.from('students').select(`
@@ -118,10 +118,19 @@ export default function ParentStudentDashboard({ session }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* جدول النقط */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100 text-emerald-700">
-              <Award size={20} />
-              <h3 className="font-bold text-gray-800">النتائج الدراسية والنقاط</h3>
+            <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 text-emerald-700">
+              <div className="flex items-center gap-2">
+                <Award size={20} />
+                <h3 className="font-bold text-gray-800">النتائج الدراسية والنقاط</h3>
+              </div>
+              <button
+                onClick={() => window.print()}
+                className="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 border border-emerald-200"
+              >
+                🖨️ طباعة النتائج (PDF)
+              </button>
             </div>
+
             {grades.length === 0 ? (
               <p className="text-sm text-gray-500 text-center py-6">لا توجد نقط مسجلة حتى الآن.</p>
             ) : (
@@ -201,5 +210,4 @@ export default function ParentStudentDashboard({ session }) {
       </main>
     </div>
   );
-    }
-            
+}
