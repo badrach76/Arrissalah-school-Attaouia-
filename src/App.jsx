@@ -10,7 +10,7 @@ export default function App() {
   const [session, setSession] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState('main'); // 'main' أو 'admission'
+  const [currentView, setCurrentView] = useState('main');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -41,11 +41,16 @@ export default function App() {
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
-      setUserRole(data?.role);
+      if (error) {
+        // إذا لم يتم العثور على الجدول أو السجل، امنح دوراً افتراضياً أو تجنب الانهيار
+        console.warn('تنبيه في جلب الصلاحيات، سيتم التعامل كـ زائر أو حساب عام:', error.message);
+        setUserRole('visitor');
+      } else {
+        setUserRole(data?.role || 'visitor');
+      }
     } catch (error) {
-      console.error('خطأ في تحديد دور المستخدم:', error.message);
-      setUserRole(null);
+      console.error('خطأ غير متوقع:', error.message);
+      setUserRole('visitor');
     } finally {
       setLoading(false);
     }
@@ -59,7 +64,6 @@ export default function App() {
     );
   }
 
-  // إذا اختار الزائر عرض صفحة التسجيل القبلي وهو غير مسجل الدخول
   if (!session && currentView === 'admission') {
     return <AdmissionsPortal isAdmin={false} onBack={() => setCurrentView('main')} />;
   }
@@ -92,8 +96,8 @@ export default function App() {
       return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 text-center" dir="rtl">
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-md w-full">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">الحساب غير مرتبط بدور محدد</h2>
-            <p className="text-sm text-gray-500 mb-6">المرجو التواصل مع إدارة المؤسسة لتعيين صلاحيات حسابك.</p>
+            <h2 className="text-xl font-bold text-gray-800 mb-2">تم تسجيل الدخول بنجاح</h2>
+            <p className="text-sm text-gray-500 mb-6">حسابك مفعل، لكن لم يتم ربطه بدور محدد بعد في قاعدة البيانات.</p>
             <button
               onClick={() => supabase.auth.signOut()}
               className="w-full bg-red-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition"
@@ -105,4 +109,3 @@ export default function App() {
       );
   }
 }
-// update 
