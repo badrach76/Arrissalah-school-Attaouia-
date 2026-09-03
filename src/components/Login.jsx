@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 
-export default function Login() {
+export default function Login({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -9,43 +9,56 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     setLoading(true);
     setErrorMsg('');
 
     try {
-      // 1. تسجيل الدخول عبر Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
       if (authError) throw authError;
 
-      // 2. جلب دور المستخدم (Role) من جدول profiles
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('role, full_name')
-        .eq('id', authData.user.id)
-        .single();
+      const { data: profileData, error: profileError } =
+        await supabase
+          .from('profiles')
+          .select('role, full_name')
+          .eq('id', authData.user.id)
+          .single();
 
       if (profileError) throw profileError;
 
-      alert(`مرحباً بك ${profileData.full_name} - دورك هو: ${profileData.role}`);
-      // هنا يمكنك توجيه المستخدم حسب دوره (إدارة، أستاذ، ولي أمر، تلميذ)
+      onLogin({
+        user: authData.user,
+        role: profileData.role,
+        full_name: profileData.full_name,
+      });
 
     } catch (error) {
-      setErrorMsg(error.message);
+      setErrorMsg(error.message || 'حدث خطأ أثناء تسجيل الدخول');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4" dir="rtl">
+    <div
+      className="min-h-screen bg-gray-50 flex items-center justify-center p-4"
+      dir="rtl"
+    >
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800">مؤسسة الرسالة للتعليم</h1>
-          <p className="text-sm text-gray-500 mt-2">منصة التدبير التربوي والإداري</p>
+          <h1 className="text-2xl font-bold text-gray-800">
+            مؤسسة الرسالة للتعليم
+          </h1>
+
+          <p className="text-sm text-gray-500 mt-2">
+            منصة التدبير التربوي والإداري
+          </p>
         </div>
 
         {errorMsg && (
@@ -55,10 +68,14 @@ export default function Login() {
         )}
 
         <form onSubmit={handleLogin} className="space-y-4">
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              البريد الإلكتروني
+            </label>
+
             <input
-              type="email5"
+              type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -68,7 +85,10 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              كلمة المرور
+            </label>
+
             <input
               type="password"
               required
@@ -82,10 +102,11 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition duration-200 shadow-md"
+            className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-medium rounded-lg transition duration-200 shadow-md"
           >
-            {loading}
+            {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
           </button>
+
         </form>
       </div>
     </div>
