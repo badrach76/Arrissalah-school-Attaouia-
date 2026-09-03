@@ -1,4 +1,3 @@
-const DEV_ADMIN_LOGIN = import.meta.env.VITE_DEV_ADMIN_LOGIN === 'true';
 import React, { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
@@ -6,6 +5,11 @@ import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import TeacherDashboard from './components/TeacherDashboard';
 import ParentStudentDashboard from './components/ParentStudentDashboard';
+
+const DEV_ADMIN_LOGIN = true;
+
+const DEV_ADMIN_LOGIN =
+  import.meta.env.VITE_DEV_ADMIN_LOGIN === 'true';
 
 export default function App() {
   const [session, setSession] = useState(null);
