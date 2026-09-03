@@ -1,19 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
+import AdminDashboard from './components/AdminDashboard';
 
 export default function App() {
+  // جلسة وهمية تجاوزاً للتشغيل المباشر
+  const fakeSession = { user: { id: 'admin-bypass-id', email: 'admin@school.com' } };
+
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '40px',
-        fontWeight: 'bold',
-        direction: 'rtl'
-      }}
-    >
-      اختبار جديد من GitHub
+    <div dir="rtl">
+      <AdminDashboard session={fakeSession} />
     </div>
   );
 }
