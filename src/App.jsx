@@ -1,6 +1,19 @@
 import React from 'react';
-import AdminDashboard from './components/AdminDashboard';
 
 export default function App() {
-  return <AdminDashboard />;
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '40px',
+        fontWeight: 'bold',
+        direction: 'rtl'
+      }}
+    >
+      اختبار جديد من GitHub
+    </div>
+  );
 }
