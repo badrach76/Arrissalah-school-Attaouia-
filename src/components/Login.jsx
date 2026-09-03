@@ -53,7 +53,7 @@ export default function Login({ onLogin }) {
 
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-800">
-            مؤسسة الرسالة للتعليم
+            مؤسسة الرسالة للتعليم الخصوصي
           </h1>
 
           <p className="text-sm text-gray-500 mt-2">
