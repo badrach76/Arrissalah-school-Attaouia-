@@ -1,3 +1,4 @@
+const DEV_ADMIN_LOGIN = import.meta.env.VITE_DEV_ADMIN_LOGIN === 'true';
 import React, { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
@@ -99,7 +100,9 @@ export default function App() {
       </div>
     );
   }
-
+if (DEV_ADMIN_LOGIN && !session) {
+  return <AdminDashboard onLogout={handleLogout} />;
+}
   if (!session || !profile) {
     return <Login onLogin={handleLogin} />;
   }
